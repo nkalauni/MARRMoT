@@ -24,7 +24,7 @@ function [val,c,idx,w] = of_KGE(obs, sim, idx, w)
 % Gupta, H. V., Kling, H., Yilmaz, K. K., & Martinez, G. F. (2009). 
 % Decomposition of the mean squared error and NSE performance criteria: 
 % Implications for improving hydrological modelling. Journal of Hydrology, 
-% 377(1–2), 80–91. https://doi.org/10.1016/j.jhydrol.2009.08.003
+% 377(1?2), 80?91. https://doi.org/10.1016/j.jhydrol.2009.08.003
 
 %% Check inputs and select timesteps
 if nargin < 2

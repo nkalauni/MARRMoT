@@ -35,7 +35,7 @@ input_climatology.delta_t  = 1;                                                 
 
 % Model name 
 % NOTE: these can be found in the Model Descriptions
-model = 'm_29_hymod_5p_5s';                     
+model     = 'm_14_topmodel_7p_2s';                     
 
 % Parameter values
 % NOTE: descriptions of these parameters can be found in the Model
@@ -44,21 +44,21 @@ model = 'm_29_hymod_5p_5s';
 % model name above (i.e. 'm_29_hymod_5p_5s') and click 
 % "Open 'm_29_hymod_5p_5s'". Parameters are listed on lines 44-50.
 
-input_theta     = [ 35;                                                     % Soil moisture depth [mm]
-                     3.7;                                                   % Soil depth distribution parameter [-]
-                     0.4;                                                   % Fraction of soil moisture excess that goes to fast runoff [-]
-                     0.25;                                                  % Runoff coefficient of the upper three stores [d-1]
-                     0.01];                                                 % Runoff coefficient of the lower store [d-1]
+input_theta       = [1;
+                    0.5123;
+                    0.66286;
+                    21.327;
+                    0;
+                    4.9803;
+                    4.9599];                                             % Runoff coefficient of the lower store [d-1]
 
 % Initial storage values
 % NOTE: see the model function for the order in which stores are given. For
 % HyMOD, this is on lines 86-91.
 
-input_s0       = [15;                                                       % Initial soil moisture storage [mm]
-                   7;                                                       % Initial fast flow 1 storage [mm]
-                   3;                                                       % Initial fast flow 2 storage [mm] 
-                   8;                                                       % Initial fast flow 3 storage [mm] 
-                  22];                                                      % Initial slow flow storage [mm]
+input_s0       = [0;
+                  0];
+                  
 %% %% 3. Define the solver settings  
 % Create a solver settings data input structure. 
 % NOTE: the names of all structure fields are hard-coded in the model class.
@@ -88,13 +88,14 @@ m.S0            = input_s0;
     
 %% 6. Analyze the outputs                   
 % Prepare a time vector
-t = data_MARRMoT_examples.dates_as_datenum;
+##t = data_MARRMoT_examples.dates_as_datenum;
 
 % Compare simulated and observed streamflow by calculating the Kling-Gupta
 % Efficiency (KGE). Other objective functions provided are inverse KGE and
 % multi-objective average KGE (0.5*(KGE(Q) + KGE(1/Q))
-tmp_obs  = data_MARRMoT_examples.streamflow;
+##tmp_obs  = data_MARRMoT_examples.streamflow;
 tmp_sim  = output_ex.Q;
+tmp_obs = Q_obs;
 tmp_kge  = of_KGE(tmp_obs,tmp_sim);                                         % KGE on regular flows
 tmp_kgei = of_inverse_KGE(tmp_obs,tmp_sim);                                 % KGE on inverse flows
 tmp_kgem = of_mean_hilo_KGE(tmp_obs,tmp_sim);                               % Average of KGE(Q) and KGE(1/Q)
@@ -115,7 +116,7 @@ figure('color','w');
     set(h2,'LineWidth',2)
     set(gca,'fontsize',16);
 
-clear hi h2 
+clear h1 h2 
     
 % Investigate internal storage changes
 figure('color','w');
@@ -153,4 +154,4 @@ figure('color','w');
     set(h4,'LineWidth',2)
     set(h5,'LineWidth',2)
 
-clear p* h* t
+##clear p* h* 

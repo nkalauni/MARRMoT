@@ -548,10 +548,10 @@ classdef MARRMoT_model < handle
                          i = find(diff(cal_idx(i:end)) ~= 1, 1) + i - 1;
                          if isempty(i); i = numel(cal_idx); end
                          previous = cal_idx(i);
-                         cal_idx_str = append(cal_idx_str, '-', num2str(previous));
+                         cal_idx_str = [cal_idx_str "-" num2str(previous)];
                      else
                          previous = cal_idx(i);
-                         cal_idx_str = append(cal_idx_str, ', ', num2str(previous));
+                         cal_idx_str = [cal_idx_str ", " num2str(previous)];
                      end
                  end
     

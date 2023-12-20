@@ -33,9 +33,17 @@
 % the value of an objective function and can be used as input to an
 % optimiser.
 
+% Turn off warning
+
+warning('off', 'all')
+
 %% 1. Prepare data
 % Load the data
 load MARRMoT_example_data.mat
+
+C = csv2cell('chepe_data.csv');
+S = cell2struct( C(2:end,:).', C(1,:) );
+datevalues = datenum(C(2:end,1), 'mm/dd/yyyy');
 
 % Create a climatology data input structure. 
 % NOTE: the names of all structure fields are hard-coded in each model
@@ -45,8 +53,13 @@ input_climatology.temp     = data_MARRMoT_examples.temperature;                 
 input_climatology.pet      = data_MARRMoT_examples.potential_evapotranspiration;    % Daily data: Ep rate [mm/d]
 input_climatology.delta_t  = 1;                                                     % time step size of the inputs: 1 [d]
 
+input_climatology.precip   = cell2mat(C(2:end,2));
+input_climatology.temp     = cell2mat(C(2:end,3));
+input_climatology.pet      = cell2mat(C(2:end,4));
+
 % Extract observed streamflow
 Q_obs = data_MARRMoT_examples.streamflow;
+Q_obs = cell2mat(C(2:end,5));
 
 %% 2. Define the model settings and create the model object
 model     = 'm_29_hymod_5p_5s';                                          % Name of the model function (these can be found in Supporting Material 2)
@@ -80,6 +93,7 @@ optim_opts.insigma = .3*(parRanges(:,2) - parRanges(:,1));                 % sta
 optim_opts.LBounds  = parRanges(:,1);                                      % lower bounds of parameters
 optim_opts.UBounds  = parRanges(:,2);                                      % upper bounds of parameters
 optim_opts.PopSize  = 4 + floor(3*log(numParams));                         % population size (default)
+%optim_opts.PopSize  = 10;
 optim_opts.TolX       = 1e-6 * min(optim_opts.insigma);                    % stopping criterion on changes to parameters 
 optim_opts.TolFun     = 1e-6;                                              % stopping criterion on changes to fitness function
 optim_opts.TolHistFun = 1e-6;                                              % stopping criterion on changes to fitness function
@@ -102,10 +116,17 @@ optim_opts.EvalParallel = false;
 %optim_opts.Seed = 1234;                                                    % for reproducibility
 
 % initial parameter set
-par_ini = mean(parRanges,2);                                               % same as default value
+par_ini = mean(parRanges,2);   
+                                            % same as default value
+##par_ini = [ 1231.5;
+##            0.0131;
+##            0.0;
+##            0.6834;
+##            1.0];
+            
 
 % Choose the objective function
-of_name      = 'of_KGE';                                                   % This function is provided as part of MARRMoT. See ./MARRMoT/Functions/Objective functions
+of_name      = 'of_NSE';                                                   % This function is provided as part of MARRMoT. See ./MARRMoT/Functions/Objective functions
 weights      = [1,1,1];                                                    % Weights for the three KGE components
 
 %
@@ -115,7 +136,7 @@ weights      = [1,1,1];                                                    % Wei
 % independent evaluation.
 n = length(Q_obs);
 warmup = 365;
-cal_idx = (warmup+1):(warmup+365*2);
+cal_idx = (warmup+1):(warmup+365*16);
 eval_idx = max(cal_idx):n;
 
 %% 5. Calibrate the model
@@ -125,7 +146,7 @@ eval_idx = max(cal_idx):n;
 
 % first set up the model
 m.input_climate = input_climatology;
-%m.delta_t       = input_climatology.delta_t;         % unnecessary if input_climate already contains .delta_t
+m.delta_t       = input_climatology.delta_t;         % unnecessary if input_climate already contains .delta_t
 m.solver_opts   = input_solver_opts;
 m.S0            = input_s0;
 
@@ -158,6 +179,7 @@ of_eval = feval(of_name,...                                                % Obj
               
 % Prepare a time vector
 t = data_MARRMoT_examples.dates_as_datenum;
+
 
 % Compare simulated and observed streamflow
 figure('color','w'); 

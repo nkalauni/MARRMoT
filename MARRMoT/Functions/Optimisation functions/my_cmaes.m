@@ -159,7 +159,7 @@ function [xmin,...                                                         % Sol
 %
 % See also FMINSEARCH, FMINUNC, FMINBND.
 
-cmaVersion = '3.61.beta'; 
+cmaVersion = '3.61.beta';
 
 % ----------- Set Defaults for Input Parameters and Options -------------
 % These defaults may be edited for convenience
@@ -167,7 +167,7 @@ cmaVersion = '3.61.beta';
 % Options defaults: Stopping criteria % (value of stop flag)
 defopts.insigma      = '[] % when left empty, it defaults to the standard deviation of xstart if all(size(xstart) > 1) or to';
 defopts.StopFitness  = '-Inf % stop if f(xmin) < stopfitness, minimization';
-defopts.MaxFunEvals  = 'Inf  % maximal number of fevals';
+defopts.MaxFunEvals  = '100  % maximal number of fevals';
 defopts.MaxIter      = '1e3*(N+5)^2/sqrt(popsize) % maximal number of iterations';
 defopts.StopFunEvals = 'Inf  % stop after resp. evaluation, possibly resume later';
 defopts.StopIter     = 'Inf  % stop after resp. iteration, possibly resume later';
@@ -198,7 +198,7 @@ defopts.PopSize      = '(4 + floor(3*log(N)))  % population size, lambda';
 defopts.ParentNumber = 'floor(popsize/2)       % AKA mu, popsize equals lambda';
 defopts.RecombinationWeights = 'superlinear decrease % or linear, or equal';
 defopts.DiagonalOnly = '0*(1+100*N/sqrt(popsize))+(N>=1000)  % C is diagonal for given iterations, 1==always'; 
-defopts.Noise.on = '0  % uncertainty handling is off by default'; 
+defopts.Noise.on = '1  % uncertainty handling is off by default'; 
 defopts.Noise.reevals  = '1*ceil(0.05*lambda)  % nb. of re-evaluated for uncertainty measurement';
 defopts.Noise.theta = '0.5  % threshold to invoke uncertainty treatment'; % smaller: more likely to diverge
 defopts.Noise.cum = '0.3  % cumulation constant for uncertainty'; 
@@ -251,7 +251,7 @@ defopts.Science  = 'on  % off==do some additional (minor) problem capturing, NOT
 defopts.ReadSignals = 'on  % from file signals.par for termination, yet a stumb';
 defopts.Seed = 'sum(100*clock)  % evaluated if it is a string';
 defopts.DispFinal  = 'on   % display messages like initial and final message';
-defopts.DispModulo = '100  % [0:Inf], disp messages after every i-th iteration';
+defopts.DispModulo = '1  % [0:Inf], disp messages after every i-th iteration';
 defopts.SaveVariables = 'on   % [on|final|off][-v6] save variables to .mat file';
 defopts.SaveFilename = 'variablescmaes.mat  % save all variables, see SaveVariables'; 
 defopts.LogModulo = '1    % [0:Inf] if >1 record data less frequently after gen=100';
@@ -1689,10 +1689,10 @@ while isempty(stopflag)
     if flgsaving && countiter > 2
       clear idx; % prevents error under octave
       % -v6 : non-compressed non-unicode for version 6 and earlier
-      if ~isempty(strsaving) && ~isoctave
-	save('-mat', strsaving, inopts.SaveFilename); % for inspection and possible restart	
+      if ~isempty(strsaving) && isoctave
+	save('-text', inopts.SaveFilename); % for inspection and possible restart	
       else 
-	save('-mat', inopts.SaveFilename); % for inspection and possible restart
+	save('-text', inopts.SaveFilename); % for inspection and possible restart
       end
       time.saving = time.saving + time.c * max(0,etime(clock, time.t3)); 
     end
@@ -1733,9 +1733,9 @@ end
 if flgsavingfinal
   clear idx; % prevents error under octave
   if ~isempty(strsaving) && ~isoctave
-    save('-mat', strsaving, inopts.SaveFilename); % for inspection and possible restart	
+    save('-text', strsaving, inopts.SaveFilename); % for inspection and possible restart	
   else 
-    save('-mat', inopts.SaveFilename);    % for inspection and possible restart
+    save('-text', inopts.SaveFilename);    % for inspection and possible restart
   end
   message = [' (saved to ' inopts.SaveFilename ')'];
 else
@@ -3062,8 +3062,7 @@ function f=frand(x)
 %%% REFERENCES
 %
 % The equation numbers refer to 
-% Hansen, N. and S. Kern (2004). Evaluating the CMA Evolution
-% Strategy on Multimodal Test Functions.  Eighth International
+% Hansen, N. and S. Kern (2004). .  Eighth International
 % Conference on Parallel Problem Solving from Nature PPSN VIII,
 % Proceedings, pp. 282-291, Berlin: Springer. 
 % (http://www.bionik.tu-berlin.de/user/niko/ppsn2004hansenkern.pdf)
